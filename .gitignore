@@ -1,0 +1,11 @@
+# Working directory - all build artifacts, downloads, and mounts
+peit/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# PowerShell
+*.tmp

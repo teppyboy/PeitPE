@@ -1,0 +1,13 @@
+{
+    "SourceISO": "peit\\HBCD_PE_x64.iso",
+    "WorkDir": "peit",
+    "ISOExtractDir": "peit\\iso",
+    "MountDir": "peit\\mount",
+    "OutputISO": "peit\\HBCD_PE_x64_Modified.iso",
+    "WimIndex": 1,
+    "WimFile": "sources\\boot.wim",
+    "WallpaperSource": "assets\\wallpaper.jpg",
+    "OscdimgPath": "",
+    "SevenZipPath": "",
+    "DownloadCacheDir": "peit\\cache"
+}

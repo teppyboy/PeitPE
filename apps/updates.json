@@ -1,0 +1,121 @@
+{
+    "comment": "Apps already present in Hiren's BootCD PE to update to latest versions.",
+    "apps": [
+        {
+            "name": "CPU-Z",
+            "description": "CPU, motherboard and memory information",
+            "enabled": true,
+            "source": "direct",
+            "downloadUrl": "https://www.cpuid.com/downloads/cpu-z/cpu-z_2.13-en.zip",
+            "type": "zip",
+            "extractSubDir": "",
+            "targetPath": "\\Programs\\CPU-Z",
+            "executableHint": "cpuz_x64.exe"
+        },
+        {
+            "name": "GPU-Z",
+            "description": "GPU information utility",
+            "enabled": true,
+            "source": "direct",
+            "downloadUrl": "https://download.techpowerup.com/files/GPU-Z.2.61.0.exe",
+            "type": "exe",
+            "targetPath": "\\Programs\\GPU-Z",
+            "executableHint": "GPU-Z.exe"
+        },
+        {
+            "name": "HWiNFO64",
+            "description": "Hardware information and diagnostics",
+            "enabled": true,
+            "source": "direct",
+            "downloadUrl": "https://www.fosshub.com/HWiNFO.html",
+            "type": "zip",
+            "extractSubDir": "",
+            "targetPath": "\\Programs\\HWiNFO64",
+            "executableHint": "HWiNFO64.exe",
+            "note": "Update downloadUrl to the latest portable ZIP from fosshub.com/HWiNFO.html"
+        },
+        {
+            "name": "CrystalDiskInfo",
+            "description": "HDD/SSD health monitoring",
+            "enabled": true,
+            "source": "github",
+            "owner": "nakamura-ken",
+            "repo": "CrystalDiskInfo",
+            "assetPattern": "CrystalDiskInfo.*Portable.*\\.zip$",
+            "type": "zip",
+            "extractSubDir": "CrystalDiskInfo",
+            "targetPath": "\\Programs\\CrystalDiskInfo",
+            "executableHint": "DiskInfo64.exe"
+        },
+        {
+            "name": "CrystalDiskMark",
+            "description": "Disk benchmark utility",
+            "enabled": true,
+            "source": "github",
+            "owner": "nakamura-ken",
+            "repo": "CrystalDiskMark",
+            "assetPattern": "CrystalDiskMark.*Portable.*\\.zip$",
+            "type": "zip",
+            "extractSubDir": "CrystalDiskMark",
+            "targetPath": "\\Programs\\CrystalDiskMark",
+            "executableHint": "DiskMark64.exe"
+        },
+        {
+            "name": "Autoruns",
+            "description": "Sysinternals Autoruns - startup manager",
+            "enabled": true,
+            "source": "direct",
+            "downloadUrl": "https://download.sysinternals.com/files/Autoruns.zip",
+            "type": "zip",
+            "extractSubDir": "",
+            "targetPath": "\\Programs\\Autoruns",
+            "executableHint": "Autoruns64.exe"
+        },
+        {
+            "name": "ProcessExplorer",
+            "description": "Sysinternals Process Explorer",
+            "enabled": true,
+            "source": "direct",
+            "downloadUrl": "https://download.sysinternals.com/files/ProcessExplorer.zip",
+            "type": "zip",
+            "extractSubDir": "",
+            "targetPath": "\\Programs\\ProcessExplorer",
+            "executableHint": "procexp64.exe"
+        },
+        {
+            "name": "TCPView",
+            "description": "Sysinternals network connections viewer",
+            "enabled": true,
+            "source": "direct",
+            "downloadUrl": "https://download.sysinternals.com/files/TCPView.zip",
+            "type": "zip",
+            "extractSubDir": "",
+            "targetPath": "\\Programs\\TCPView",
+            "executableHint": "Tcpview.exe"
+        },
+        {
+            "name": "WizTree",
+            "description": "Disk space analyzer",
+            "enabled": true,
+            "source": "direct",
+            "downloadUrl": "https://diskanalyzer.com/files/wiztree_4_22_portable.zip",
+            "type": "zip",
+            "extractSubDir": "",
+            "targetPath": "\\Programs\\WizTree",
+            "executableHint": "WizTree64.exe",
+            "note": "Update downloadUrl to latest portable zip from diskanalyzer.com"
+        },
+        {
+            "name": "Recuva",
+            "description": "File recovery tool",
+            "enabled": true,
+            "source": "direct",
+            "downloadUrl": "https://www.ccleaner.com/recuva/builds",
+            "type": "zip",
+            "extractSubDir": "",
+            "targetPath": "\\Programs\\Recuva",
+            "executableHint": "Recuva64.exe",
+            "note": "Update downloadUrl to latest portable zip from ccleaner.com/recuva/builds"
+        }
+    ]
+}
