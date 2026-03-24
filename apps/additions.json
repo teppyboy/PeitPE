@@ -1,5 +1,5 @@
 {
-    "comment": "New apps to inject into Hiren's BootCD PE that are not already present.",
+    "comment": "New apps to add to PeitPE that are not already present.",
     "apps": [
         {
             "name": "Ventoy",
@@ -8,57 +8,57 @@
             "source": "github",
             "owner": "ventoy",
             "repo": "Ventoy",
-            "assetPattern": "ventoy-.*-windows\\.zip$",
+            "asset_pattern": "ventoy-.*-windows\\.zip$",
             "type": "zip",
-            "extractSubDir": "ventoy-*",
-            "targetPath": "\\Programs\\Ventoy",
-            "executableHint": "Ventoy2Disk.exe"
+            "extract_sub_dir": "ventoy-*",
+            "target_path": "\\Programs\\Ventoy",
+            "executable_hint": "Ventoy2Disk.exe"
         },
         {
             "name": "NTLite",
             "description": "Windows image modification tool (free portable)",
             "enabled": false,
             "source": "direct",
-            "downloadUrl": "",
+            "download_url": "",
             "type": "zip",
-            "extractSubDir": "",
-            "targetPath": "\\Programs\\NTLite",
-            "executableHint": "NTLite.exe",
-            "note": "Provide downloadUrl manually. NTLite free does not allow redistribution."
+            "extract_sub_dir": "",
+            "target_path": "\\Programs\\NTLite",
+            "executable_hint": "NTLite.exe",
+            "note": "Provide download_url manually. NTLite free does not allow redistribution."
         },
         {
             "name": "Everything",
             "description": "Instant file search engine",
             "enabled": true,
             "source": "direct",
-            "downloadUrl": "https://www.voidtools.com/Everything-1.4.1.1026.x64.zip",
+            "download_url": "https://www.voidtools.com/Everything-1.4.1.1026.x64.zip",
             "type": "zip",
-            "extractSubDir": "",
-            "targetPath": "\\Programs\\Everything",
-            "executableHint": "Everything.exe",
-            "note": "Update downloadUrl to latest portable x64 zip from voidtools.com"
+            "extract_sub_dir": "",
+            "target_path": "\\Programs\\Everything",
+            "executable_hint": "Everything.exe",
+            "note": "Update download_url to latest portable x64 zip from voidtools.com"
         },
         {
             "name": "BlueScreenView",
             "description": "BSOD / minidump viewer",
             "enabled": true,
             "source": "direct",
-            "downloadUrl": "https://www.nirsoft.net/utils/bluescreenview-x64.zip",
+            "download_url": "https://www.nirsoft.net/utils/bluescreenview-x64.zip",
             "type": "zip",
-            "extractSubDir": "",
-            "targetPath": "\\Programs\\BlueScreenView",
-            "executableHint": "BlueScreenView.exe"
+            "extract_sub_dir": "",
+            "target_path": "\\Programs\\BlueScreenView",
+            "executable_hint": "BlueScreenView.exe"
         },
         {
             "name": "MemTest86",
             "description": "RAM testing utility (USB image - add documentation link only)",
             "enabled": false,
             "source": "direct",
-            "downloadUrl": "",
+            "download_url": "",
             "type": "zip",
-            "extractSubDir": "",
-            "targetPath": "\\Programs\\MemTest86",
-            "executableHint": "",
+            "extract_sub_dir": "",
+            "target_path": "\\Programs\\MemTest86",
+            "executable_hint": "",
             "note": "MemTest86 runs standalone. Include only if PE can chain-boot to USB."
         },
         {
@@ -66,21 +66,21 @@
             "description": "Firefox saved password recovery",
             "enabled": true,
             "source": "direct",
-            "downloadUrl": "https://www.nirsoft.net/utils/passwordfox-x64.zip",
+            "download_url": "https://www.nirsoft.net/utils/passwordfox-x64.zip",
             "type": "zip",
-            "extractSubDir": "",
-            "targetPath": "\\Programs\\PasswordFox",
-            "executableHint": "PasswordFox.exe"
+            "extract_sub_dir": "",
+            "target_path": "\\Programs\\PasswordFox",
+            "executable_hint": "PasswordFox.exe"
         },
         {
             "name": "PuTTY",
             "description": "SSH/Telnet client",
             "enabled": true,
             "source": "direct",
-            "downloadUrl": "https://the.earth.li/~sgtatham/putty/latest/w64/putty.exe",
+            "download_url": "https://the.earth.li/~sgtatham/putty/latest/w64/putty.exe",
             "type": "exe",
-            "targetPath": "\\Programs\\PuTTY",
-            "executableHint": "putty.exe"
+            "target_path": "\\Programs\\PuTTY",
+            "executable_hint": "putty.exe"
         }
     ]
 }

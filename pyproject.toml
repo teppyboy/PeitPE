@@ -1,0 +1,21 @@
+[project]
+name = "peitpe-builder"
+version = "1.0.0"
+description = "PeitPE - Windows PE ISO Modifier"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31.0",
+    "tqdm>=4.66.0",
+    "beautifulsoup4>=4.12.0",
+    "Pillow>=10.0.0",
+]
+
+[project.scripts]
+peitpe = "build:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["peitpe"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

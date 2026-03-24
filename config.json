@@ -1,13 +1,13 @@
 {
-    "SourceISO": "peit\\HBCD_PE_x64.iso",
-    "WorkDir": "peit",
-    "ISOExtractDir": "peit\\iso",
-    "MountDir": "peit\\mount",
-    "OutputISO": "peit\\HBCD_PE_x64_Modified.iso",
-    "WimIndex": 1,
-    "WimFile": "sources\\boot.wim",
-    "WallpaperSource": "assets\\wallpaper.jpg",
-    "OscdimgPath": "",
-    "SevenZipPath": "",
-    "DownloadCacheDir": "peit\\cache"
+    "source_iso": "peit\\HBCD_PE_x64.iso",
+    "work_dir": "peit",
+    "iso_extract_dir": "peit\\iso",
+    "mount_dir": "peit\\mount",
+    "output_iso": "peit\\PeitPE-x86_64-testing-20260325.iso",
+    "wim_index": 1,
+    "wim_file": "sources\\boot.wim",
+    "wallpaper_source": "assets\\128286023_p0.jpg",
+    "oscdimg_path": "",
+    "seven_zip_path": "",
+    "download_cache_dir": "peit\\cache"
 }
