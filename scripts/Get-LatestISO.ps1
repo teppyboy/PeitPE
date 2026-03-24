@@ -20,13 +20,12 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-# ── Load config if called standalone ────────────────────────────────────────
+# Load config if called standalone
 if (-not $Config) {
     $cfgFile = Join-Path $PSScriptRoot ".." "config.json"
     $raw     = Get-Content $cfgFile -Raw | ConvertFrom-Json
     $Config  = @{}
     $raw.PSObject.Properties | ForEach-Object { $Config[$_.Name] = $_.Value }
-    # Resolve relative paths
     $pathKeys = 'SourceISO','WorkDir','ISOExtractDir','MountDir','OutputISO','DownloadCacheDir'
     foreach ($key in $pathKeys) {
         if ($Config[$key] -and -not [IO.Path]::IsPathRooted($Config[$key])) {
@@ -40,7 +39,7 @@ if (-not (Test-Path $OutputDir)) {
     New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
 }
 
-# ── Fetch the download page ──────────────────────────────────────────────────
+# Fetch the download page
 $downloadPage = "https://www.hirensbootcd.org/download/"
 Write-Host "[*] Checking latest Hiren's BootCD PE release..." -ForegroundColor Cyan
 Write-Host "    Page: $downloadPage"
@@ -52,17 +51,16 @@ try {
     throw "Failed to fetch download page '$downloadPage': $_"
 }
 
-# ── Parse ISO download link ──────────────────────────────────────────────────
-# Hiren's site links the ISO directly; match href ending in .iso
+# Parse ISO download link - match href ending in .iso
 $isoLink = $response.Links |
     Where-Object { $_.href -match '\.iso(\?.*)?$' } |
     Select-Object -First 1
 
 if (-not $isoLink) {
     # Fallback: scan raw HTML for any .iso URL
-    $match = [regex]::Match($response.Content, 'https?://[^\s"''<>]+\.iso\b')
-    if ($match.Success) {
-        $isoUrl = $match.Value
+    $htmlMatch = [regex]::Match($response.Content, 'https?://[^\s"<>]+\.iso\b')
+    if ($htmlMatch.Success) {
+        $isoUrl = $htmlMatch.Value
     } else {
         throw "Could not find an ISO download link on '$downloadPage'. The page layout may have changed."
     }
@@ -77,22 +75,22 @@ if (-not $isoLink) {
 
 Write-Host "    ISO URL : $isoUrl" -ForegroundColor DarkGray
 
-# ── Derive local filename and path ───────────────────────────────────────────
+# Derive local filename and path
 $isoFileName = [IO.Path]::GetFileName(($isoUrl -split '\?')[0])
 $isoDestPath = Join-Path $OutputDir $isoFileName
 
 # Keep config in sync so the rest of the pipeline uses the right filename
 $Config['SourceISO'] = $isoDestPath
 
-# ── Check for existing checksum on the page ──────────────────────────────────
-$sha256Pattern = '(?i)sha[-\s]?256[:\s]+([0-9a-f]{64})'
+# Check for SHA-256 checksum published on the page
+$sha256Pattern = '(?i)sha-?256[:\s]+([0-9a-f]{64})'
 $expectedHash  = $null
 if ($response.Content -match $sha256Pattern) {
     $expectedHash = $Matches[1].ToUpper()
     Write-Host "    Expected SHA-256: $expectedHash" -ForegroundColor DarkGray
 }
 
-# ── Skip if already current ──────────────────────────────────────────────────
+# Skip download if file already exists and checksum matches
 if (-not $Force -and (Test-Path $isoDestPath)) {
     Write-Host "    Found existing: $isoDestPath" -ForegroundColor DarkGray
     if ($expectedHash) {
@@ -102,14 +100,14 @@ if (-not $Force -and (Test-Path $isoDestPath)) {
             Write-Host "[OK] ISO is already up to date (checksum verified)." -ForegroundColor Green
             return $isoDestPath
         }
-        Write-Warning "Checksum mismatch — re-downloading. Expected: $expectedHash  Got: $actual"
+        Write-Warning "Checksum mismatch - re-downloading. Expected: $expectedHash  Got: $actual"
     } else {
-        Write-Host "[OK] ISO already present (no checksum available to verify). Use -Force to re-download." -ForegroundColor Green
+        Write-Host "[OK] ISO already present (no checksum to verify). Use -Force to re-download." -ForegroundColor Green
         return $isoDestPath
     }
 }
 
-# ── Download via BITS (supports resume + progress) ───────────────────────────
+# Download via BITS (supports resume + progress display)
 $partFile = "$isoDestPath.part"
 Write-Host "[*] Downloading ISO to: $isoDestPath" -ForegroundColor Cyan
 
@@ -118,11 +116,11 @@ try {
     Start-BitsTransfer -Source $isoUrl -Destination $partFile `
                        -DisplayName "Hiren's BootCD PE ISO" -Description $isoFileName
 } catch {
-    # BITS unavailable (e.g. service disabled) — fall back to WebClient with progress
+    # BITS unavailable - fall back to WebClient with progress
     Write-Warning "BITS unavailable, falling back to WebClient: $_"
-    $wc = New-Object Net.WebClient
-    $wc.Headers.Add('User-Agent', 'HirensBootCD-Modifier/1.0')
+    $wc      = New-Object Net.WebClient
     $lastPct = -1
+    $wc.Headers.Add('User-Agent', 'HirensBootCD-Modifier/1.0')
     Register-ObjectEvent $wc DownloadProgressChanged -SourceIdentifier WcProgress -Action {
         $pct = $event.SourceEventArgs.ProgressPercentage
         if ($pct -ne $script:lastPct) {
@@ -138,7 +136,7 @@ try {
 
 Move-Item $partFile $isoDestPath -Force
 
-# ── Verify checksum post-download ────────────────────────────────────────────
+# Verify checksum after download
 if ($expectedHash) {
     Write-Host "[*] Verifying download..." -ForegroundColor Cyan
     $actual = (Get-FileHash $isoDestPath -Algorithm SHA256).Hash
