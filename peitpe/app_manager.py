@@ -290,3 +290,90 @@ def process_additions(config: AppConfig) -> None:
         config.seven_zip_path,
         update_mode=False,
     )
+
+
+def create_start_menu_shortcuts(config: AppConfig) -> None:
+    """
+    Create Start Menu shortcuts for all injected apps.
+
+    Places shortcuts in the WIM's Start Menu Programs folder
+    so they appear in Windows search.
+    """
+    import subprocess
+
+    mount_dir = Path(config.mount_dir)
+    start_menu_dir = (
+        mount_dir / "ProgramData" / "Microsoft" / "Windows" / "Start Menu" / "Programs"
+    )
+
+    if not start_menu_dir.exists():
+        print("  [WARN] Start Menu Programs folder not found in WIM. Skipping.")
+        return
+
+    # Load app definitions
+    project_root = Path(config.source_iso).parent.parent
+    apps = []
+    for json_name in ("updates.json", "additions.json"):
+        json_path = project_root / "apps" / json_name
+        if json_path.exists():
+            apps.extend(load_app_definitions(json_path))
+
+    enabled = get_enabled_apps(apps)
+
+    if not enabled:
+        return
+
+    print(f"[*] Creating Start Menu shortcuts for {len(enabled)} app(s)...")
+    iso_extract_dir = Path(config.iso_extract_dir)
+
+    created = 0
+    for app in enabled:
+        if not app.executable_hint:
+            continue
+
+        app_dir = iso_extract_dir / app.target_path.lstrip("\\")
+        if not app_dir.exists():
+            print(f"    [SKIP] {app.name}: app directory not found")
+            continue
+
+        # Find executable
+        exe_path = None
+        for root, _dirs, files in app_dir.walk():
+            for file in files:
+                if file.lower() == app.executable_hint.lower():
+                    exe_path = root / file
+                    break
+            if exe_path:
+                break
+
+        if not exe_path:
+            print(
+                f"    [SKIP] {app.name}: executable '{app.executable_hint}' not found"
+            )
+            continue
+
+        # Create shortcut
+        relative_exe = exe_path.relative_to(iso_extract_dir)
+        shortcut_path = start_menu_dir / f"{app.name}.lnk"
+
+        ps_script = f"""
+        $WshShell = New-Object -ComObject WScript.Shell
+        $Shortcut = $WshShell.CreateShortcut("{shortcut_path}")
+        $Shortcut.TargetPath = "Y:\\{relative_exe}"
+        $Shortcut.WorkingDirectory = "Y:\\{relative_exe.parent}"
+        $Shortcut.Save()
+        """
+
+        try:
+            subprocess.run(
+                ["powershell", "-Command", ps_script],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            print(f"    [OK] {app.name}")
+            created += 1
+        except subprocess.CalledProcessError as e:
+            print(f"    [WARN] Failed: {app.name} - {e.stderr}")
+
+    print(f"[OK] Created {created} Start Menu shortcut(s).")

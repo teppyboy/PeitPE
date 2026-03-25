@@ -81,6 +81,16 @@
             "type": "exe",
             "target_path": "\\Programs\\PuTTY",
             "executable_hint": "putty.exe"
+        },
+        {
+            "name": "PartitionWizard",
+            "description": "Disk partition manager",
+            "enabled": true,
+            "source": "direct",
+            "download_url": "https://homelab.june8th.eu.org/windows/tools/PartitionWizard10.exe",
+            "type": "exe",
+            "target_path": "\\Programs\\PartitionWizard",
+            "executable_hint": "PartitionWizard.exe"
         }
     ]
 }

@@ -31,7 +31,11 @@ from peitpe.prerequisites import verify_prerequisites
 from peitpe.iso_downloader import download_iso
 from peitpe.iso_extractor import extract_iso
 from peitpe.wim_manager import mount_wim, unmount_wim
-from peitpe.app_manager import process_updates, process_additions
+from peitpe.app_manager import (
+    process_updates,
+    process_additions,
+    create_start_menu_shortcuts,
+)
 from peitpe.rebranding import rebrand
 from peitpe.wallpaper import replace_wallpaper
 from peitpe.iso_builder import build_iso
@@ -171,14 +175,20 @@ Examples:
     else:
         print("\n[*] Skipping app updates and additions.")
 
-    # Step 5: Mount WIM (only needed for rebranding and wallpaper replacement)
+    # Step 5: Mount WIM (needed for rebranding, wallpaper, or Start Menu shortcuts)
     need_wim_mount = (
-        not args.skip_wallpaper and not config.skip_wallpaper
-    ) or not args.skip_rebrand
+        (not args.skip_wallpaper and not config.skip_wallpaper)
+        or not args.skip_rebrand
+        or not args.skip_apps
+    )
 
     if need_wim_mount:
         invoke_step("Mount WIM", mount_wim, config)
         _was_mounted = True
+
+        # Create Start Menu shortcuts for injected apps
+        if not args.skip_apps:
+            invoke_step("Start Menu Shortcuts", create_start_menu_shortcuts, config)
 
         # Step 6: Rebrand (update boot text and config files)
         if not args.skip_rebrand:

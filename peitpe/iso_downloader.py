@@ -122,6 +122,7 @@ def download_iso(config: AppConfig, force: bool = False) -> None:
     # Extract filename and destination path
     iso_filename = extract_iso_filename(iso_url)
     work_dir = Path(config.work_dir)
+    work_dir.mkdir(parents=True, exist_ok=True)
     iso_dest = work_dir / iso_filename
 
     # Update config with actual ISO path
