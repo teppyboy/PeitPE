@@ -62,17 +62,6 @@
             "note": "MemTest86 runs standalone. Include only if PE can chain-boot to USB."
         },
         {
-            "name": "PasswordFox",
-            "description": "Firefox saved password recovery",
-            "enabled": true,
-            "source": "direct",
-            "download_url": "https://www.nirsoft.net/utils/passwordfox-x64.zip",
-            "type": "zip",
-            "extract_sub_dir": "",
-            "target_path": "\\Programs\\PasswordFox",
-            "executable_hint": "PasswordFox.exe"
-        },
-        {
             "name": "PuTTY",
             "description": "SSH/Telnet client",
             "enabled": true,
@@ -83,11 +72,11 @@
             "executable_hint": "putty.exe"
         },
         {
-            "name": "PartitionWizard",
+            "name": "Partition Wizard",
             "description": "Disk partition manager",
             "enabled": true,
             "source": "direct",
-            "download_url": "https://homelab.june8th.eu.org/windows/tools/PartitionWizard10.exe",
+            "download_url": "https://public.june8th.eu.org/windows/tools/PartitionWizard10.exe",
             "type": "exe",
             "target_path": "\\Programs\\PartitionWizard",
             "executable_hint": "PartitionWizard.exe"

@@ -39,6 +39,8 @@ from peitpe.app_manager import (
 from peitpe.rebranding import rebrand
 from peitpe.wallpaper import replace_wallpaper
 from peitpe.iso_builder import build_iso
+from peitpe.wim_optimizer import compress_wim
+from peitpe.iso_cleaner import clean_iso, clean_wim
 
 
 # Global config for cleanup
@@ -110,6 +112,16 @@ Examples:
         "--skip-build", action="store_true", help="Skip final ISO build"
     )
     parser.add_argument(
+        "--skip-compress",
+        action="store_true",
+        help="Skip WIM compression (faster build, larger ISO)",
+    )
+    parser.add_argument(
+        "--skip-cleanup",
+        action="store_true",
+        help="Skip removal of duplicate apps and language files",
+    )
+    parser.add_argument(
         "--force-download",
         action="store_true",
         help="Re-download ISO even if it exists",
@@ -168,6 +180,12 @@ Examples:
     else:
         print("\n[*] Skipping ISO extraction.")
 
+    # Step 2b: Clean ISO (remove duplicate apps, trim languages)
+    if not args.skip_cleanup:
+        invoke_step("Clean ISO", clean_iso, config)
+    else:
+        print("\n[*] Skipping ISO cleanup.")
+
     # Step 3 & 4: Apps (inject into ISO directory, not WIM)
     if not args.skip_apps:
         invoke_step("Update Apps", process_updates, config)
@@ -202,13 +220,23 @@ Examples:
         else:
             print("\n[*] Skipping wallpaper update.")
 
+        # Step 7b: Clean WIM (remove logs, unnecessary fonts, duplicate firmware)
+        if not args.skip_cleanup:
+            invoke_step("Clean WIM", clean_wim, config)
+
         # Step 8: Unmount WIM
         invoke_step("Unmount WIM", unmount_wim, config)
         _was_mounted = False
     else:
         print("\n[*] Skipping WIM mount/unmount (rebrand and wallpaper skipped).")
 
-    # Step 8: Build ISO
+    # Step 9: Compress WIM (after unmount, before ISO build)
+    if not args.skip_compress:
+        invoke_step("Compress WIM", compress_wim, config)
+    else:
+        print("\n[*] Skipping WIM compression.")
+
+    # Step 10: Build ISO
     if not args.skip_build:
         invoke_step("Build ISO", build_iso, config)
     else:

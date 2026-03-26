@@ -2,39 +2,6 @@
     "comment": "Apps to update in PeitPE to latest versions.",
     "apps": [
         {
-            "name": "CPU-Z",
-            "description": "CPU, motherboard and memory information",
-            "enabled": true,
-            "source": "direct",
-            "download_url": "https://www.cpuid.com/downloads/cpu-z/cpu-z_2.13-en.zip",
-            "type": "zip",
-            "extract_sub_dir": "",
-            "target_path": "\\Programs\\CPU-Z",
-            "executable_hint": "cpuz_x64.exe"
-        },
-        {
-            "name": "GPU-Z",
-            "description": "GPU information utility",
-            "enabled": true,
-            "source": "direct",
-            "download_url": "https://download.techpowerup.com/files/GPU-Z.2.61.0.exe",
-            "type": "exe",
-            "target_path": "\\Programs\\GPU-Z",
-            "executable_hint": "GPU-Z.exe"
-        },
-        {
-            "name": "HWiNFO64",
-            "description": "Hardware information and diagnostics",
-            "enabled": true,
-            "source": "direct",
-            "download_url": "https://www.fosshub.com/HWiNFO.html",
-            "type": "zip",
-            "extract_sub_dir": "",
-            "target_path": "\\Programs\\HWiNFO64",
-            "executable_hint": "HWiNFO64.exe",
-            "note": "Update download_url to the latest portable ZIP from fosshub.com/HWiNFO.html"
-        },
-        {
             "name": "Autoruns",
             "description": "Sysinternals Autoruns - startup manager",
             "enabled": true,
@@ -80,19 +47,6 @@
             "target_path": "\\Programs\\WizTree",
             "executable_hint": "WizTree64.exe",
             "note": "Update download_url to latest portable zip from diskanalyzer.com"
-        },
-        {
-            "name": "WinNTSetup",
-            "description": "Windows installation and deployment tool",
-            "enabled": true,
-            "source": "github",
-            "owner": "JFX",
-            "repo": "WinNTSetup",
-            "asset_pattern": "WinNTSetup.*\\.7z$",
-            "type": "7z",
-            "extract_sub_dir": "",
-            "target_path": "\\Programs\\WinNTSetup",
-            "executable_hint": "WinNTSetup_x64.exe"
         }
     ]
 }

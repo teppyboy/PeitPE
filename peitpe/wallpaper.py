@@ -121,6 +121,74 @@ def replace_wallpaper_file(source: Path, dest: Path, convert: bool = False) -> N
     print(f"    Replaced: {dest.relative_to(dest.parent.parent.parent)}")
 
 
+def set_wallpaper_registry(mount_dir: Path, wallpaper_path: str) -> None:
+    """
+    Set wallpaper registry key in the default user hive.
+
+    This ensures Windows uses the wallpaper instead of defaulting to "Solid Colors".
+
+    Args:
+        mount_dir: WIM mount directory
+        wallpaper_path: Path to the wallpaper file (on the PE system)
+    """
+    hive_path = mount_dir / "Windows" / "System32" / "config" / "DEFAULT"
+
+    if not hive_path.exists():
+        print("    [WARN] DEFAULT user hive not found. Skipping registry update.")
+        return
+
+    print("    Setting wallpaper registry keys...")
+
+    # Load the default user hive
+    load_cmd = ["reg", "load", "HKU\\TempHive", str(hive_path)]
+    exit_code, output = run_command(load_cmd)
+
+    if exit_code != 0:
+        print(f"    [WARN] Failed to load registry hive: {output}")
+        return
+
+    try:
+        # Set wallpaper path
+        wallpaper_key = "HKU\\TempHive\\Control Panel\\Desktop"
+        run_command(
+            [
+                "reg",
+                "add",
+                wallpaper_key,
+                "/v",
+                "Wallpaper",
+                "/t",
+                "REG_SZ",
+                "/d",
+                wallpaper_path,
+                "/f",
+            ]
+        )
+
+        # Set wallpaper style: 10 = Fill (matches "Windows Default Backgrounds")
+        run_command(
+            [
+                "reg",
+                "add",
+                wallpaper_key,
+                "/v",
+                "WallpaperStyle",
+                "/t",
+                "REG_SZ",
+                "/d",
+                "10",
+                "/f",
+            ]
+        )
+
+        print(f"    Wallpaper: {wallpaper_path}")
+        print("    Style: Fill")
+    finally:
+        # Always unload the hive
+        unload_cmd = ["reg", "unload", "HKU\\TempHive"]
+        run_command(unload_cmd)
+
+
 def replace_wallpaper(config: AppConfig) -> None:
     """
     Replace the WinPE wallpaper with a custom image.
@@ -166,5 +234,8 @@ def replace_wallpaper(config: AppConfig) -> None:
             replace_wallpaper_file(wallpaper_src, dest, convert=needs_convert)
         except Exception as e:
             print(f"    [FAIL] Failed to replace {dest.name}: {e}")
+
+    # Set registry key so Windows uses the wallpaper
+    set_wallpaper_registry(mount_dir, "X:\\Windows\\System32\\winpe.jpg")
 
     print("[OK] Wallpaper replaced.")
