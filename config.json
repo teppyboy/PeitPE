@@ -3,7 +3,7 @@
     "work_dir": "peit",
     "iso_extract_dir": "peit\\iso",
     "mount_dir": "peit\\mount",
-    "output_iso": "peit\\PeitPE-x86_64-testing-20260325.iso",
+    "output_iso": "peit\\PeitPE-x86_64-testing-{date}.iso",
     "wim_index": 1,
     "wim_file": "sources\\boot.wim",
     "wallpaper_source": "assets\\128286023_p0.jpg",

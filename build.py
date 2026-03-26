@@ -41,6 +41,7 @@ from peitpe.wallpaper import replace_wallpaper
 from peitpe.iso_builder import build_iso
 from peitpe.wim_optimizer import compress_wim
 from peitpe.iso_cleaner import clean_iso, clean_wim
+from peitpe.upx_packer import compress_apps
 
 
 # Global config for cleanup
@@ -122,6 +123,11 @@ Examples:
         help="Skip removal of duplicate apps and language files",
     )
     parser.add_argument(
+        "--skip-upx",
+        action="store_true",
+        help="Skip UPX compression of portable executables",
+    )
+    parser.add_argument(
         "--force-download",
         action="store_true",
         help="Re-download ISO even if it exists",
@@ -192,6 +198,12 @@ Examples:
         invoke_step("Add New Apps", process_additions, config)
     else:
         print("\n[*] Skipping app updates and additions.")
+
+    # Step 4b: UPX compress portable executables
+    if not args.skip_upx:
+        invoke_step("UPX Compress", compress_apps, config)
+    else:
+        print("\n[*] Skipping UPX compression.")
 
     # Step 5: Mount WIM (needed for rebranding, wallpaper, or Start Menu shortcuts)
     need_wim_mount = (

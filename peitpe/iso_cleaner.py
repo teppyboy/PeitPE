@@ -18,7 +18,14 @@ from .config import AppConfig
 # Tier 1: ISO Programs cleanup
 # =============================================================================
 
-# Apps to remove entirely (directories and their .lnk shortcuts)
+# Apps to keep (do NOT remove these):
+#   7-Zip, AnyDesk, BlueScreenView, CPU-Z, Crystal Disk Info, DiskGenius,
+#   Everything, GPU-Z, GSmartControl, ImageUSB, Macrium Reflect, NTPWedit,
+#   PartitionWizard (added), PuTTY, Recuva, Rufus,
+#   Sysinternals Suite, SystemInformer, TCPView, Ventoy, VeraCrypt*,
+#   WinNTSetup, WizTree
+#   * = language/doc files trimmed but app kept
+
 DUPLICATE_APPS: list[str] = [
     # --- Duplicate partition managers (keep PartitionWizard + DiskGenius) ---
     "AOMEI Partition Assistant",
@@ -32,11 +39,13 @@ DUPLICATE_APPS: list[str] = [
     "Aero Admin",
     # --- Duplicate disk analyzer (keep WizTree) ---
     "TreeSize",
-    # --- Duplicate image viewer (keep IrfanView) ---
+    # --- Duplicate image viewer (drop IrfanView too) ---
     "FSViewer",
+    "IrfanView",
     # --- Duplicate system info (keep CPU-Z + GPU-Z + SystemInformer) ---
     "HWInfo",
     "Speccy",
+    "HDTune",
     # --- Sysinternals duplicates (already in Sysinternals Suite/) ---
     "Autoruns",
     "TCPView",
@@ -47,40 +56,48 @@ DUPLICATE_APPS: list[str] = [
     "Unstoppable Copier",
     "Runtime DriveImage XML",
     "Lazesoft Recovery Suite",
+    "DriveSnapshot",
     # --- Niche / built-in Windows tools ---
     "AquaKeyTest",
     "CDBurnerXP",
-    "Defraggler",
     "WordPad",
     "Change Keyboard Layout",
     "ChkDskGUI",
     # --- Other redundant ---
-    "DriveSnapshot",
     "ExamDiff",
     "HDDLLF",
     "HDDScan",
     "Registry Backup",
     "WesternDigital",
     "Windows Login Unlocker",
+    # --- Not needed in PE environment ---
+    "VLC Media Player",  # media player
+    "SoftMaker FreeOffice",  # office suite
+    "AOMEI Backupper",  # duplicate backup (keep Macrium Reflect)
+    "WinMerge",  # diff tool
+    "Total Commander",  # duplicate file manager
+    "SumatraPDF",  # PDF viewer
+    "McAfee Stinger",  # antivirus scanner
+    "WinSCP",  # SCP client (keep PuTTY)
+    "ESET Online Scanner",  # antivirus scanner
+    "Eraser",  # secure delete
+    "ShowKeyPlus",  # license key viewer
+    "EasyBCD",  # BCD editor (keep WinNTSetup)
+    "AttributeChanger",  # file attributes
+    "Linux Reader",  # ext2/3/4 reader
+    "Dependency Walker",  # DLL dependency viewer
+    "RegShot",  # registry comparison
+    # --- Duplicate backup/imaging ---
+    "ReDeploy",  # Macrium ReDeploy subfolder if separate
 ]
 
 # Subdirectories to strip from remaining apps (languages, docs, unused archs)
+# Note: VLC, AOMEI Backupper, WinMerge, SoftMaker FreeOffice are now fully removed
 LANGUAGE_TRIM: dict[str, list[str]] = {
-    "VLC Media Player": ["locale", "languages", "hrtfs", "sdk", "msi"],
     "VeraCrypt": ["Languages", "docs"],
-    "AOMEI Backupper": ["lang"],
-    "WinMerge": ["Languages", "Docs"],
-    "SoftMaker FreeOffice": [
-        "pmFree_en.chm",
-        "pmFreeManual_en.pdf",
-        "prFree_en.chm",
-        "prFreeManual_en.pdf",
-        "tmFree_en.chm",
-        "tmFreeManual_EN.pdf",
-        "smash_de.chm",
-        "smash_en.chm",
-    ],
     "SystemInformer": ["i386", "arm64"],
+    "DiskGenius": ["Language"],
+    "WizTree": ["locale"],
 }
 
 # Documentation file patterns to remove across all apps
@@ -388,7 +405,7 @@ WIM_FONT_REMOVE: list[str] = [
 WIM_DUPLICATE_APPS: list[str] = [
     # Duplicate browser (keep Chrome)
     "Mozilla Firefox",
-    # Duplicate image viewer (keep IrfanView from ISO Programs)
+    # Duplicate image viewer (keep from ISO Programs)
     "FSViewer",
     # Duplicate/redundant tools
     "HDDScan",
@@ -396,6 +413,10 @@ WIM_DUPLICATE_APPS: list[str] = [
     "Macrorit Partition Expert",
     "Macrorit Partition Extender",
     "Victoria",
+    # Additional removals
+    "AOMEI Partition Assistant",
+    "Defraggler",
+    "Registry Backup",
 ]
 
 
@@ -532,10 +553,147 @@ def trim_duplicate_firmware(mount_dir: Path) -> int:
     return removed
 
 
+def trim_wim_defender(mount_dir: Path) -> int:
+    """Remove Windows Defender from the WIM (not needed in PE)."""
+    defender_dir = mount_dir / "Windows" / "Windows Defender"
+
+    if not defender_dir.exists():
+        return 0
+
+    try:
+        shutil.rmtree(defender_dir)
+        print(f"    [-] Windows/Windows Defender/")
+        return 1
+    except OSError as e:
+        print(f"    [WARN] Failed to remove Windows Defender: {e}")
+        return 0
+
+
+def trim_wim_mui_resources(mount_dir: Path) -> int:
+    """Remove non-en-US MUI language resource directories from System32 and SysWOW64."""
+    removed = 0
+
+    for sys_dir_name in ("System32", "SysWOW64"):
+        sys_dir = mount_dir / "Windows" / sys_dir_name
+        if not sys_dir.exists():
+            continue
+
+        for item in sys_dir.iterdir():
+            if not item.is_dir():
+                continue
+
+            # Match language directories like "en-GB", "de-DE", "fr-FR", "ja-JP"
+            name = item.name
+            parts = name.split("-")
+            if (
+                len(parts) == 2
+                and len(parts[0]) >= 2
+                and len(parts[0]) <= 3
+                and len(parts[1]) >= 2
+                and len(parts[1]) <= 3
+                and parts[0].isalpha()
+                and parts[1].isalpha()
+                and name.lower() != "en-us"
+            ):
+                try:
+                    shutil.rmtree(item)
+                    print(f"    [-] Windows/{sys_dir_name}/{name}/")
+                    removed += 1
+                except OSError:
+                    pass
+
+    return removed
+
+
+def trim_wim_winsxs_cache(mount_dir: Path) -> int:
+    """Remove WinSxS temp/backup/cache directories (safe, non-destructive)."""
+    removed = 0
+    winsxs = mount_dir / "Windows" / "WinSxS"
+
+    if not winsxs.exists():
+        return 0
+
+    for subdir_name in ("Temp", "Backup", "ManifestCache", "FileMaps"):
+        subdir = winsxs / subdir_name
+        if subdir.exists() and subdir.is_dir():
+            try:
+                shutil.rmtree(subdir)
+                print(f"    [-] Windows/WinSxS/{subdir_name}/")
+                removed += 1
+            except OSError as e:
+                print(f"    [WARN] Failed to remove WinSxS/{subdir_name}: {e}")
+
+    return removed
+
+
+def trim_wim_temp_files(mount_dir: Path) -> int:
+    """Remove temp/cache/crash dump directories from the WIM."""
+    removed = 0
+
+    # Directories to remove entirely (contents only, keep parent)
+    wipe_contents = [
+        Path("Windows") / "Temp",
+        Path("Windows") / "Prefetch",
+        Path("Windows") / "SoftwareDistribution",
+        Path("Windows") / "LiveKernelReports",
+        Path("Windows") / "Minidump",
+        Path("Windows") / "CSC",
+    ]
+
+    for rel_path in wipe_contents:
+        target = mount_dir / rel_path
+        if not target.exists():
+            continue
+
+        if target.is_dir():
+            # Remove contents but keep the directory
+            for item in target.iterdir():
+                try:
+                    if item.is_dir():
+                        shutil.rmtree(item)
+                    else:
+                        item.unlink()
+                    removed += 1
+                except OSError:
+                    pass
+            print(f"    [-] {rel_path}/ (contents cleared)")
+
+    # catroot2 - catalog DB cache
+    catroot2 = mount_dir / "Windows" / "System32" / "catroot2"
+    if catroot2.exists():
+        for item in catroot2.iterdir():
+            try:
+                if item.is_dir():
+                    shutil.rmtree(item)
+                else:
+                    item.unlink()
+                removed += 1
+            except OSError:
+                pass
+        print(f"    [-] Windows/System32/catroot2/ (contents cleared)")
+
+    # Individual files
+    memory_dmp = mount_dir / "Windows" / "Memory.dmp"
+    if memory_dmp.exists():
+        try:
+            memory_dmp.unlink()
+            print(f"    [-] Windows/Memory.dmp")
+            removed += 1
+        except OSError:
+            pass
+
+    return removed
+
+
 def clean_wim(config: AppConfig) -> None:
     """
     Clean the mounted WIM by removing duplicate apps, logs,
-    unnecessary fonts, and duplicate firmware.
+    unnecessary fonts, duplicate firmware, Defender, MUI resources,
+    WinSxS cache, and temp files.
+
+    NEVER touches:
+        - Windows\\System32\\DriverStore\\FileRepository\\ (drivers)
+        - Windows\\System32\\drivers\\ (core driver files)
 
     Args:
         config: Application configuration
@@ -553,6 +711,11 @@ def clean_wim(config: AppConfig) -> None:
     print(f"    Removed {n} items")
     total += n
 
+    print("[*] Removing Windows Defender...")
+    n = trim_wim_defender(mount_dir)
+    print(f"    Removed {n} items")
+    total += n
+
     print("[*] Trimming WIM log files...")
     n = trim_wim_logs(mount_dir)
     print(f"    Removed {n} items")
@@ -560,6 +723,21 @@ def clean_wim(config: AppConfig) -> None:
 
     print("[*] Trimming WIM fonts...")
     n = trim_wim_fonts(mount_dir)
+    print(f"    Removed {n} items")
+    total += n
+
+    print("[*] Trimming non-en-US MUI resources...")
+    n = trim_wim_mui_resources(mount_dir)
+    print(f"    Removed {n} items")
+    total += n
+
+    print("[*] Trimming WinSxS cache/temp...")
+    n = trim_wim_winsxs_cache(mount_dir)
+    print(f"    Removed {n} items")
+    total += n
+
+    print("[*] Trimming WIM temp/cache/crash dumps...")
+    n = trim_wim_temp_files(mount_dir)
     print(f"    Removed {n} items")
     total += n
 

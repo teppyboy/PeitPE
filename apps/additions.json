@@ -15,18 +15,6 @@
             "executable_hint": "Ventoy2Disk.exe"
         },
         {
-            "name": "NTLite",
-            "description": "Windows image modification tool (free portable)",
-            "enabled": false,
-            "source": "direct",
-            "download_url": "",
-            "type": "zip",
-            "extract_sub_dir": "",
-            "target_path": "\\Programs\\NTLite",
-            "executable_hint": "NTLite.exe",
-            "note": "Provide download_url manually. NTLite free does not allow redistribution."
-        },
-        {
             "name": "Everything",
             "description": "Instant file search engine",
             "enabled": true,
@@ -50,18 +38,6 @@
             "executable_hint": "BlueScreenView.exe"
         },
         {
-            "name": "MemTest86",
-            "description": "RAM testing utility (USB image - add documentation link only)",
-            "enabled": false,
-            "source": "direct",
-            "download_url": "",
-            "type": "zip",
-            "extract_sub_dir": "",
-            "target_path": "\\Programs\\MemTest86",
-            "executable_hint": "",
-            "note": "MemTest86 runs standalone. Include only if PE can chain-boot to USB."
-        },
-        {
             "name": "PuTTY",
             "description": "SSH/Telnet client",
             "enabled": true,
@@ -78,8 +54,8 @@
             "source": "direct",
             "download_url": "https://public.june8th.eu.org/windows/tools/PartitionWizard10.exe",
             "type": "exe",
-            "target_path": "\\Programs\\PartitionWizard",
-            "executable_hint": "PartitionWizard.exe"
+            "target_path": "\\Programs\\Partition Wizard",
+            "executable_hint": "Partition Wizard.exe"
         }
     ]
 }

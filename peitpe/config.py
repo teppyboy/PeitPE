@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -117,6 +118,12 @@ def load_config(config_path: Path) -> AppConfig:
         data = json.load(f)
 
     config = AppConfig.from_dict(data)
+
+    # Resolve template placeholders in output_iso
+    if "{date}" in config.output_iso:
+        date_str = datetime.now().strftime("%Y%m%d")
+        config.output_iso = config.output_iso.replace("{date}", date_str)
+
     config.resolve_paths(config_path.parent)
 
     return config
